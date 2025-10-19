@@ -1,0 +1,43 @@
+version: '3.8'
+
+services:
+  database:
+    image: mariadb:10.5
+    restart: always
+    environment:
+      MYSQL_DATABASE: "panel"
+      MYSQL_USER: "pterodactyl"
+      MYSQL_PASSWORD: "password123"
+      MYSQL_ROOT_PASSWORD: "rootpassword123"
+    volumes:
+      - ./database:/var/lib/mysql
+
+  panel:
+    image: ghcr.io/pterodactyl/panel:latest
+    restart: always
+    depends_on:
+      - database
+    environment:
+      APP_URL: "https://ptero-free.onrender.com"
+      APP_TIMEZONE: "Asia/Jakarta"
+      APP_SERVICE_AUTHOR: "noreply@example.com"
+      TRUSTED_PROXIES: "*"
+      MAIL_FROM: "noreply@example.com"
+      MAIL_DRIVER: "smtp"
+      MAIL_HOST: "mail"
+      MAIL_PORT: "1025"
+      MAIL_USERNAME: ""
+      MAIL_PASSWORD: ""
+      MAIL_ENCRYPTION: "true"
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./panel:/app
+
+  mail:
+    image: mailhog/mailhog
+    restart: always
+    ports:
+      - "1025:1025"
+      - "8025:8025"
